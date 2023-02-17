@@ -22,7 +22,6 @@ import {
   HvListValue,
   HvWarningText,
 } from "components";
-import dropdownListClasses from "./List/dropdownListClasses";
 
 export type HvDropdownLabelsProps = {
   /**
@@ -595,9 +594,9 @@ export const HvDropdown = (props: HvDropdownProps) => {
         <HvDropdownList
           id={setId(elementId, "values")}
           classes={{
-            rootList: clsx(dropdownListClasses.rootList, classes?.rootList),
+            rootList: clsx(dropdownClasses.rootList, classes?.rootList),
             dropdownListContainer: clsx(
-              dropdownListClasses.dropdownListContainer,
+              dropdownClasses.dropdownListContainer,
               classes?.dropdownListContainer
             ),
           }}
