@@ -11,6 +11,7 @@ import {
   useHvSortBy,
   useHvTableSticky,
   useHvBulkActions,
+  HvTableColumnConfig,
 } from "../../hooks";
 import {
   HvTable,
@@ -31,8 +32,7 @@ import {
   makeSelectedData,
   getGroupedRowsColumns,
   getGroupedColumns,
-  SampleColumn,
-  SampleDataProps,
+  NewEntry,
 } from "../storiesUtils";
 import { theme } from "@hitachivantara/uikit-styles";
 import {
@@ -44,7 +44,7 @@ import {
 } from "@hitachivantara/uikit-react-icons";
 
 const UseHvHooks = () => {
-  const data: SampleDataProps[] = useMemo(() => makeData(6), []);
+  const data = useMemo(() => makeData(6), []);
 
   const { getTableProps, getTableBodyProps, prepareRow, headerGroups, rows } =
     useHvData({
@@ -137,8 +137,8 @@ return (
 };
 
 const UseHvPagination = () => {
-  const columns: SampleColumn[] = useMemo(() => getColumns(), []);
-  const data: SampleDataProps[] = useMemo(() => makeData(32), []);
+  const columns = useMemo(() => getColumns(), []);
+  const data = useMemo(() => makeData(32), []);
 
   const {
     getTableProps,
@@ -148,7 +148,7 @@ const UseHvPagination = () => {
     page,
     state: { pageSize },
     getHvPaginationProps,
-  } = useHvData<SampleDataProps>({ columns, data }, useHvPagination);
+  } = useHvData<NewEntry>({ columns, data }, useHvPagination);
 
   const EmptyRow = () => (
     <HvTableRow>
@@ -272,11 +272,11 @@ return (
 };
 
 const UseHvSelection = () => {
-  const columns: SampleColumn[] = useMemo(() => getColumns(), []);
-  const data: SampleDataProps[] = useMemo(() => makeData(6), []);
+  const columns = useMemo(() => getColumns(), []);
+  const data = useMemo(() => makeData(6), []);
 
   const { getTableProps, getTableBodyProps, prepareRow, headerGroups, rows } =
-    useHvData<SampleDataProps>({ columns, data }, useHvRowSelection);
+    useHvData<NewEntry>({ columns, data }, useHvRowSelection);
 
   return (
     <HvTableContainer>
@@ -361,12 +361,12 @@ return (
 };
 
 const UseHvSelectionControlled = () => {
-  const columns: SampleColumn[] = useMemo(() => getColumns(), []);
-  const initialData: SampleDataProps[] = useMemo(() => makeSelectedData(6), []);
+  const columns = useMemo(() => getColumns(), []);
+  const initialData = useMemo(() => makeSelectedData(6), []);
   const [data, setData] = useState(initialData);
 
   const { getTableProps, getTableBodyProps, prepareRow, headerGroups, rows } =
-    useHvData<SampleDataProps>(
+    useHvData<NewEntry>(
       { columns, data, manualRowSelectedKey: "selected" },
       useHvRowSelection
     );
@@ -476,7 +476,7 @@ return (
 };
 
 const UseHvBulkActions = () => {
-  const columns: SampleColumn[] = useMemo(() => getColumns(), []);
+  const columns = useMemo(() => getColumns(), []);
   const [data, setData] = useState(makeData(64));
 
   const {
@@ -489,7 +489,7 @@ const UseHvBulkActions = () => {
     toggleAllRowsSelected,
     getHvBulkActionsProps,
     getHvPaginationProps,
-  } = useHvData<SampleDataProps>(
+  } = useHvData<NewEntry>(
     { columns, data },
     useHvPagination,
     useHvRowSelection,
@@ -727,7 +727,7 @@ const UseHvSortBy = () => {
     };
   }, []);
 
-  const columns: SampleColumn[] = useMemo(() => {
+  const columns = useMemo(() => {
     const cols = getColumns();
     cols[2].disableSortBy = true;
     cols[5].sortType = colSort;
@@ -737,7 +737,7 @@ const UseHvSortBy = () => {
   const data = useMemo(() => makeData(5), []);
 
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
-    useHvData<SampleDataProps>({ columns, data }, useHvSortBy);
+    useHvData<NewEntry>({ columns, data }, useHvSortBy);
 
   return (
     <HvTableContainer>
@@ -840,8 +840,8 @@ return (
 };
 
 const UseHvRowExpand = () => {
-  const columns: SampleColumn[] = useMemo(() => getColumns(), []);
-  const data: SampleDataProps[] = useMemo(() => makeData(6), []);
+  const columns = useMemo(() => getColumns(), []);
+  const data = useMemo(() => makeData(6), []);
   const i18n = useMemo(
     () => ({
       expandRowButtonAriaLabel: "Click to expand this row",
@@ -851,7 +851,7 @@ const UseHvRowExpand = () => {
   );
 
   const { getTableProps, getTableBodyProps, prepareRow, headerGroups, rows } =
-    useHvData<SampleDataProps>({ columns, data, labels: i18n }, useHvRowExpand);
+    useHvData<NewEntry>({ columns, data, labels: i18n }, useHvRowExpand);
 
   return (
     <HvTableContainer>
@@ -988,11 +988,11 @@ return (
 };
 
 const UseHvGroupBy = () => {
-  const columns: SampleColumn[] = useMemo(() => getGroupedRowsColumns(), []);
-  const data: SampleDataProps[] = useMemo(() => makeData(6), []);
+  const columns = useMemo(() => getGroupedRowsColumns(), []);
+  const data = useMemo(() => makeData(6), []);
 
   const { getTableProps, getTableBodyProps, prepareRow, headerGroups, rows } =
-    useHvData<SampleDataProps>(
+    useHvData<NewEntry>(
       {
         columns,
         data,
@@ -1147,7 +1147,7 @@ return (
 };
 
 const UseHvTableSticky = () => {
-  const columns: SampleColumn[] = useMemo(
+  const columns: HvTableColumnConfig<NewEntry>[] = useMemo(
     () => [
       { Header: "Title", accessor: "name", sticky: "left", width: 120 },
       {
@@ -1175,7 +1175,7 @@ const UseHvTableSticky = () => {
     ],
     []
   );
-  const data: SampleDataProps[] = useMemo(() => makeData(100), []);
+  const data = useMemo(() => makeData(100), []);
 
   const {
     getTableProps,
@@ -1184,7 +1184,7 @@ const UseHvTableSticky = () => {
     prepareRow,
     headerGroups,
     rows,
-  } = useHvData<SampleDataProps>(
+  } = useHvData<NewEntry>(
     {
       columns,
       data,
@@ -1317,11 +1317,11 @@ return (
 };
 
 const UseHvHeaderGroups = () => {
-  const columns: SampleColumn[] = useMemo(() => getGroupedColumns(), []);
-  const data: SampleDataProps[] = useMemo(() => makeData(), []);
+  const columns = useMemo(() => getGroupedColumns(), []);
+  const data = useMemo(() => makeData(), []);
 
   const { getTableProps, getTableBodyProps, prepareRow, headerGroups, rows } =
-    useHvData<SampleDataProps>(
+    useHvData<NewEntry>(
       {
         columns,
         data,

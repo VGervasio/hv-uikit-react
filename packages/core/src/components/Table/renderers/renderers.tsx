@@ -10,6 +10,7 @@ import {
   HvTagProps,
   HvBaseSwitchProps,
   HvListValue,
+  HvCellProps,
 } from "~/components";
 import DateColumnCell from "./DateColumnCell/index";
 import SwitchColumnCell from "./SwitchColumnCell";

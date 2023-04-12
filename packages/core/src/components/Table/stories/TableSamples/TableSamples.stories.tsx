@@ -8,6 +8,7 @@ import {
   useHvSortBy,
   useHvBulkActions,
   useHvResizeColumns,
+  HvTableColumnConfig,
 } from "../../hooks";
 import {
   HvTable,
@@ -32,8 +33,7 @@ import {
   makeData,
   getColumns,
   makeSelectedData,
-  SampleColumn,
-  SampleDataProps,
+  NewEntry,
 } from "../storiesUtils";
 import {
   Ban,
@@ -57,7 +57,7 @@ const Complete = () => {
   }, []);
 
   const columns = useMemo(() => {
-    const cols: SampleColumn[] = [
+    const cols: HvTableColumnConfig<NewEntry>[] = [
       ...getColumns(),
       {
         id: "actions",
@@ -107,7 +107,7 @@ const Complete = () => {
     return cols;
   }, [colSort]);
 
-  const initialData: SampleDataProps[] = useMemo(
+  const initialData = useMemo(
     () =>
       makeSelectedData(64).map((entry) => ({
         ...entry,
@@ -139,7 +139,7 @@ const Complete = () => {
     toggleAllRowsSelected,
     getHvBulkActionsProps,
     getHvPaginationProps,
-  } = useHvData<SampleDataProps>(
+  } = useHvData<NewEntry>(
     {
       columns,
       data,
@@ -464,8 +464,8 @@ return (
 };
 
 const EmptyCells = () => {
-  const columns: SampleColumn[] = useMemo(() => getColumns(), []);
-  const data: SampleDataProps[] = useMemo(
+  const columns = useMemo(() => getColumns(), []);
+  const data = useMemo(
     () =>
       makeData(6).map((entry) => ({
         ...entry,
@@ -476,7 +476,7 @@ const EmptyCells = () => {
   );
 
   const { getTableProps, getTableBodyProps, prepareRow, headerGroups, rows } =
-    useHvData<SampleDataProps>({
+    useHvData<NewEntry>({
       columns,
       data,
       defaultColumn: {
@@ -587,9 +587,9 @@ return (
 };
 
 const LockedSelection = () => {
-  const data: SampleDataProps[] = useMemo(() => makeData(64), []);
+  const data = useMemo(() => makeData(64), []);
 
-  const columns: SampleColumn[] = useMemo(
+  const columns: HvTableColumnConfig<NewEntry>[] = useMemo(
     () => [
       ...getColumns(),
       {
@@ -621,7 +621,7 @@ const LockedSelection = () => {
     selectedFlatRows,
     getHvBulkActionsProps,
     getHvPaginationProps,
-  } = useHvData<SampleDataProps>(
+  } = useHvData<NewEntry>(
     {
       columns,
       data,
@@ -862,9 +862,9 @@ const AlternativeLayout = () => {
   const [layoutHook, setLayoutHook] = useState(() => useFlexLayout);
   const [tableElements, setTableElements] = useState(false);
 
-  const data: SampleDataProps[] = useMemo(() => makeData(64), []);
+  const data = useMemo(() => makeData(64), []);
 
-  const columns: SampleColumn[] = useMemo(
+  const columns: HvTableColumnConfig<NewEntry>[] = useMemo(
     () => [
       { Header: "Title", accessor: "name", minWidth: 120 },
       { Header: "Time", accessor: "createdDate", minWidth: 100 },
@@ -1063,7 +1063,7 @@ return (
 };
 
 const ColumnResize = () => {
-  const columns: SampleColumn[] = useMemo(
+  const columns: HvTableColumnConfig<NewEntry>[] = useMemo(
     () => [
       { Header: "Title", accessor: "name", minWidth: 120 },
       { Header: "Time", accessor: "createdDate", minWidth: 100 },
@@ -1083,7 +1083,7 @@ const ColumnResize = () => {
     ],
     []
   );
-  const data: SampleDataProps[] = useMemo(() => makeData(6), []);
+  const data = useMemo(() => makeData(6), []);
 
   const defaultColumn = useMemo(
     () => ({
@@ -1095,7 +1095,7 @@ const ColumnResize = () => {
   );
 
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
-    useHvData<SampleDataProps>(
+    useHvData<NewEntry>(
       {
         columns,
         data,
