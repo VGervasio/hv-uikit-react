@@ -13,7 +13,6 @@ import {
   useHvBulkActions,
   useHvPagination,
 } from "@hitachivantara/uikit-react-core";
-
 import { ListView, CardView } from "components/assetInventory";
 import {
   getColumns,
@@ -31,7 +30,7 @@ const AssetInventory = () => {
   const [data] = useState(originalData);
   const columns = useMemo(() => getColumns(), []);
 
-  const instance = useHvData(
+  const instance = useHvData<AssetInventoryModel>(
     {
       data,
       columns,
@@ -46,7 +45,7 @@ const AssetInventory = () => {
 
   const bulkActionProps = instance.getHvBulkActionsProps?.();
 
-  const handleAction = (event: Event, id: string, action: HvActionGeneric) =>
+  const handleAction = (event, id, action: HvActionGeneric) =>
     alert(
       `Callback for action ${action.label} on items ${instance.selectedFlatRows
         .map((r) => r.id)
@@ -59,7 +58,7 @@ const AssetInventory = () => {
         views={views}
         defaultView="card"
         callbacks={instance}
-        onViewChange={(evt, id) => setCurrentView(id)}
+        onViewChange={(_, id) => setCurrentView(id)}
       >
         <HvLeftControl
           placeholder="Search"

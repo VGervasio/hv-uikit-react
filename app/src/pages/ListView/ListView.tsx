@@ -18,7 +18,6 @@ import {
   useHvPagination,
   useHvFilters,
 } from "@hitachivantara/uikit-react-core";
-
 import { Kpi, Table } from "components/listView";
 import { getColumns, makeData, actions } from "lib/utils/listView";
 import classes from "./styles";
@@ -36,7 +35,7 @@ const ListView = () => {
   const [kpiSelection, setKpiSelection] = useState<number | undefined>();
   const breakpoints = { xl: 3, lg: 3, md: 3, sm: 6, xs: 12 } as HvGridProps;
 
-  const instance = useHvData(
+  const instance = useHvData<ListViewModel>(
     {
       data,
       columns,
@@ -58,7 +57,7 @@ const ListView = () => {
     instance.setFilter("status", "");
   };
 
-  const handleAction = (event: Event, id: string, action: HvActionGeneric) => {
+  const handleAction = (event, id, action: HvActionGeneric) => {
     if (action.id === "refresh") {
       doRefresh();
     }

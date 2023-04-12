@@ -8,10 +8,8 @@ import {
   HvActionsGeneric,
   HvTypography,
   Breakpoint,
-  HvSemanticColorKeys,
   HvTableInstance,
 } from "@hitachivantara/uikit-react-core";
-
 import { getStatusIcon } from "lib/utils/assetInventory";
 
 interface CarViewProps {
@@ -42,9 +40,7 @@ export const CardView = ({ instance }: CarViewProps) => {
             key={`${row?.original?.name}-row`}
             style={{ width: "100%" }}
             statusColor={row?.original?.statusColor}
-            icon={getStatusIcon(
-              row?.original?.statusColor as HvSemanticColorKeys
-            )}
+            icon={getStatusIcon(row?.original?.statusColor || "")}
             selected={instance.selectedFlatRows.some((r) => r.id === row.id)}
             selectable
           >
