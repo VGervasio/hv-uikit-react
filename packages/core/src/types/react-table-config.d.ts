@@ -60,8 +60,8 @@ declare module "react-table" {
       UseGroupByOptions<D>,
       UsePaginationOptions<D>,
       UseResizeColumnsOptions<D>,
-      UseRowSelectOptions<D>,
-      UseRowStateOptions<D>,
+      UseRowSelectOptions<D>, // REMOVE ?!
+      UseRowStateOptions<D>, // REMOVE ?!
       UseSortByOptions<D>,
       Record<string, any> {}
 
@@ -69,7 +69,7 @@ declare module "react-table" {
     D extends Record<string, unknown> = Record<string, unknown>
   > extends UseExpandedHooks<D>,
       UseGroupByHooks<D>,
-      UseRowSelectHooks<D>,
+      UseRowSelectHooks<D>, // REMOVE ?!
       UseSortByHooks<D> {}
 
   export interface TableInstance<
@@ -80,8 +80,8 @@ declare module "react-table" {
       UseGlobalFiltersInstanceProps<D>,
       UseGroupByInstanceProps<D>,
       UsePaginationInstanceProps<D>,
-      UseRowSelectInstanceProps<D>,
-      UseRowStateInstanceProps<D>,
+      UseRowSelectInstanceProps<D>, // REMOVE ?!
+      UseRowStateInstanceProps<D>, // REMOVE ?!
       UseSortByInstanceProps<D> {}
 
   export interface TableState<
@@ -93,14 +93,14 @@ declare module "react-table" {
       UseGroupByState<D>,
       UsePaginationState<D>,
       UseResizeColumnsState<D>,
-      UseRowSelectState<D>,
-      UseRowStateState<D>,
+      UseRowSelectState<D>, // REMOVE ?!
+      UseRowStateState<D>, // REMOVE ?!
       UseSortByState<D> {}
 
   export interface ColumnInterface<
     D extends Record<string, unknown> = Record<string, unknown>
   > extends UseFiltersColumnOptions<D>,
-      UseGlobalFiltersColumnOptions<D>,
+      UseGlobalFiltersColumnOptions<D>, // REMOVE ?!
       UseGroupByColumnOptions<D>,
       UseResizeColumnsColumnOptions<D>,
       UseSortByColumnOptions<D> {}
@@ -116,12 +116,12 @@ declare module "react-table" {
     D extends Record<string, unknown> = Record<string, unknown>,
     V = any
   > extends UseGroupByCellProps<D>,
-      UseRowStateCellProps<D> {}
+      UseRowStateCellProps<D> {} // REMOVE ?!
 
   export interface Row<
     D extends Record<string, unknown> = Record<string, unknown>
   > extends UseExpandedRowProps<D>,
       UseGroupByRowProps<D>,
-      UseRowSelectRowProps<D>,
-      UseRowStateRowProps<D> {}
+      UseRowSelectRowProps<D>, // REMOVE ?!
+      UseRowStateRowProps<D> {} // REMOVE ?!
 }

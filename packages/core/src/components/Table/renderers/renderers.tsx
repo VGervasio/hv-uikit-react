@@ -16,14 +16,15 @@ import SwitchColumnCell from "./SwitchColumnCell";
 import ProgressColumnCell from "./ProgressColumnCell";
 import DropdownColumnCell from "./DropdownColumnCell";
 import { hvStringFallback, hvNumberFallback } from "../utils";
+import { HeaderProps, Renderer } from "react-table";
 
 export function hvTextColumn<
-  D extends Record<string, unknown>,
-  C extends HvTableColumnConfig<D>
->(col: C): HvTableColumnConfig<D> {
+  D extends object = Record<string, unknown>,
+  H extends Renderer<HeaderProps<D>> = Renderer<HeaderProps<D>>
+>(col: HvTableColumnConfig<D, H>): HvTableColumnConfig<D, H> {
   return {
-    Cell: (cellProps) => (
-      <HvOverflowTooltip data={hvStringFallback(cellProps?.value)} />
+    Cell: (cellProps: HvCellProps<D>) => (
+      <HvOverflowTooltip data={hvStringFallback(cellProps.value)} />
     ),
     sortType: "alphanumeric",
     ...col,
@@ -31,11 +32,13 @@ export function hvTextColumn<
 }
 
 export function hvNumberColumn<
-  D extends Record<string, unknown>,
-  C extends HvTableColumnConfig<D>
->(col: C): HvTableColumnConfig<D> {
+  D extends object = Record<string, unknown>,
+  H extends Renderer<HeaderProps<D>> = Renderer<HeaderProps<D>>
+>(col: HvTableColumnConfig<D, H>): HvTableColumnConfig<D, H> {
   return {
-    Cell: ({ value }) => hvNumberFallback(value),
+    Cell: (cellProps: HvCellProps<D>) => (
+      <>{hvNumberFallback(cellProps.value)}</>
+    ),
     align: "right",
     sortType: "number",
     ...col,
@@ -43,12 +46,15 @@ export function hvNumberColumn<
 }
 
 export function hvDateColumn<
-  D extends Record<string, unknown>,
-  C extends HvTableColumnConfig<D>
->(col: C, dateFormat?: string): HvTableColumnConfig<D> {
+  D extends object = Record<string, unknown>,
+  H extends Renderer<HeaderProps<D>> = Renderer<HeaderProps<D>>
+>(
+  col: HvTableColumnConfig<D, H>,
+  dateFormat?: string
+): HvTableColumnConfig<D, H> {
   return {
-    Cell: (cellProps) => (
-      <DateColumnCell date={cellProps?.value} dateFormat={dateFormat} />
+    Cell: (cellProps: HvCellProps<D>) => (
+      <DateColumnCell date={cellProps.value} dateFormat={dateFormat} />
     ),
     sortType: "alphanumeric",
     sortDescFirst: true,
@@ -56,14 +62,17 @@ export function hvDateColumn<
   };
 }
 
-export function hvExpandColumn<D extends Record<string, unknown>>(
-  col: HvTableColumnConfig<D>,
+export function hvExpandColumn<
+  D extends object = Record<string, unknown>,
+  H extends Renderer<HeaderProps<D>> = Renderer<HeaderProps<D>>
+>(
+  col: HvTableColumnConfig<D, H>,
   expandRowButtonAriaLabel: string,
   collapseRowButtonAriaLabel: string,
   getCanRowExpand?: (row: HvRowInstance<D>) => boolean
-): HvTableColumnConfig<D> {
+): HvTableColumnConfig<D, H> {
   return {
-    Cell: (cellProps) => {
+    Cell: (cellProps: HvCellProps<D>) => {
       const { value, row } = cellProps;
       const { onClick } = row.getToggleRowExpandedProps();
 
@@ -92,7 +101,6 @@ export function hvExpandColumn<D extends Record<string, unknown>>(
         </>
       );
     },
-    // @ts-ignore
     sortType: "alphanumeric",
     cellStyle: {
       position: "relative",
@@ -102,22 +110,22 @@ export function hvExpandColumn<D extends Record<string, unknown>>(
 }
 
 export function hvTagColumn<
-  D extends Record<string, unknown>,
-  C extends HvTableColumnConfig<D>,
-  A extends Record<string, unknown>
+  D extends object = Record<string, unknown>,
+  H extends Renderer<HeaderProps<D>> = Renderer<HeaderProps<D>>,
+  A extends object = Record<string, unknown>
 >(
-  col: C,
+  col: HvTableColumnConfig<D, H>,
   valueDataKey: keyof A,
   colorDataKey: keyof A,
   textColorDataKey: keyof A,
   fromRowData: boolean = false,
   tagProps?: HvTagProps
-): HvTableColumnConfig<D> {
+): HvTableColumnConfig<D, H> {
   return {
-    Cell: (cellProps) => {
+    Cell: (cellProps: HvCellProps<D>) => {
       const { value, row } = cellProps;
       if (!value) {
-        return "—";
+        return <>—</>;
       }
 
       const {
@@ -146,17 +154,17 @@ export function hvTagColumn<
 }
 
 export function hvSwitchColumn<
-  D extends Record<string, unknown>,
-  C extends HvTableColumnConfig<D>
+  D extends object = Record<string, unknown>,
+  H extends Renderer<HeaderProps<D>> = Renderer<HeaderProps<D>>
 >(
-  col: C,
+  col: HvTableColumnConfig<D, H>,
   switchLabel: string,
   falseLabel?: string,
   trueLabel?: string,
   switchProps?: HvBaseSwitchProps
-): HvTableColumnConfig<D> {
+): HvTableColumnConfig<D, H> {
   return {
-    Cell: (cellProps) => {
+    Cell: (cellProps: HvCellProps<D>) => {
       const { value, row } = cellProps;
       return (
         <SwitchColumnCell
@@ -178,17 +186,17 @@ export function hvSwitchColumn<
 }
 
 export function hvDropdownColumn<
-  D extends Record<string, unknown>,
-  C extends HvTableColumnConfig<D>
+  D extends object = Record<string, unknown>,
+  H extends Renderer<HeaderProps<D>> = Renderer<HeaderProps<D>>
 >(
-  col: C,
+  col: HvTableColumnConfig<D, H>,
   id: string,
   placeholder: string,
   disabledPlaceholder: string,
   onChange?: (identifier: string, value: HvListValue) => void
-): HvTableColumnConfig<D> {
+): HvTableColumnConfig<D, H> {
   return {
-    Cell: (cellProps) => {
+    Cell: (cellProps: HvCellProps<D>) => {
       const { value, row, column } = cellProps;
       const dsbld = value.length < 1;
       return (
@@ -212,16 +220,16 @@ export function hvDropdownColumn<
 }
 
 export function hvProgressColumn<
-  D extends Record<string, unknown>,
-  C extends HvTableColumnConfig<D>
+  D extends object = Record<string, unknown>,
+  H extends Renderer<HeaderProps<D>> = Renderer<HeaderProps<D>>
 >(
-  col: C,
+  col: HvTableColumnConfig<D, H>,
   getPartial?: (row: HvRowInstance<D>) => number,
   getTotal?: (row: HvRowInstance<D>) => number,
   color?: "primary" | "secondary"
-): HvTableColumnConfig<D> {
+): HvTableColumnConfig<D, H> {
   return {
-    Cell: (cellProps) => {
+    Cell: (cellProps: HvCellProps<D>) => {
       const { row } = cellProps;
       const partial = getPartial?.(row) || 0;
       const total = getTotal?.(row);
@@ -232,7 +240,7 @@ export function hvProgressColumn<
         );
       }
 
-      return "—";
+      return <>—</>;
     },
 
     cellStyle: {

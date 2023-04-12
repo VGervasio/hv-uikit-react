@@ -109,7 +109,6 @@ import {
   UseHvResizeColumnProps,
   UseHvResizeTableCellProps,
 } from "./useResizeColumns";
-import { HvExtraProps } from "../../../types";
 
 // #region ##### TYPES #####
 
@@ -123,9 +122,21 @@ type Accessor<D extends object> = (
   }
 ) => CellValue;
 
+type ValueOf<T> = T[keyof T];
 type StringKey<D> = Extract<keyof D, string>;
 type IdType<D> = StringKey<D> | string;
 type CellValue<V = any> = V;
+
+export interface HvCellProps<D extends object, V = any>
+  extends Omit<CellProps<D, V>, "column" | "row" | "cell"> {
+  column: HvColumnInstance<D>;
+  row: HvRowInstance<D>;
+  cell: HvCellInstance<D, V>;
+}
+
+export type HvTableDefinitionConfig<
+  D extends object = Record<string, unknown>
+> = HvTableOptions<D>;
 
 interface HvColumnInterfaceBasedOnValue<
   D extends object = Record<string, unknown>,
@@ -134,56 +145,57 @@ interface HvColumnInterfaceBasedOnValue<
   Cell?: Renderer<HvCellProps<D, V>>;
 }
 
-interface HvColumnGroupInterface<D extends object> {
-  columns: Array<HvTableColumnConfig<D>>;
+interface HvColumnGroupInterface<
+  D extends object = Record<string, unknown>,
+  H extends Renderer<HeaderProps<D>> = Renderer<HeaderProps<D>>
+> {
+  columns: Array<HvTableColumnConfig<D, H>>;
 }
 
-type HvColumnGroup<D extends object = Record<string, unknown>> =
-  HvTableColumnOptions<D> &
-    HvColumnGroupInterface<D> &
-    (
-      | { Header: string }
-      | ({ id: IdType<D> } & {
-          Header: Renderer<HeaderProps<D>>;
-        })
-    ) & { accessor?: Accessor<D> }; // Not used, but needed for backwards compatibility
-
-type ValueOf<T> = T[keyof T];
+type HvColumnGroup<
+  D extends object = Record<string, unknown>,
+  H extends Renderer<HeaderProps<D>> = Renderer<HeaderProps<D>>
+> = Omit<HvTableColumnOptions<D>, "Header"> & {
+  Header?: H;
+} & HvColumnGroupInterface<D> &
+  (
+    | { Header: H }
+    | ({ id: IdType<D> } & {
+        Header: H;
+      })
+  ) & { accessor?: Accessor<D> }; // Not used, but needed for backwards compatibility
 
 // The accessors like `foo.bar` are not supported, use functions instead
-type HvColumnWithStrictAccessor<D extends object = Record<string, unknown>> =
-  HvTableColumnOptions<D> &
-    ValueOf<{
-      [K in keyof D]: {
-        accessor: K;
-      } & HvColumnInterfaceBasedOnValue<D, D[K]>;
-    }>;
+type HvColumnWithStrictAccessor<
+  D extends object = Record<string, unknown>,
+  H extends Renderer<HeaderProps<D>> = Renderer<HeaderProps<D>>
+> = Omit<HvTableColumnOptions<D>, "Header"> & { Header?: H } & ValueOf<{
+    [K in keyof D]: {
+      accessor: K;
+    } & HvColumnInterfaceBasedOnValue<D, D[K]>;
+  }>;
 
-type HvColumnWithLooseAccessor<D extends object = Record<string, unknown>> =
-  HvTableColumnOptions<D> &
-    HvColumnInterfaceBasedOnValue<D> &
-    (
-      | { Header: string }
-      | { id: IdType<D> }
-      | { accessor: keyof D extends never ? IdType<D> : never }
-    ) & {
-      accessor?: keyof D extends never ? IdType<D> | Accessor<D> : Accessor<D>;
-    };
+type HvColumnWithLooseAccessor<
+  D extends object = Record<string, unknown>,
+  H extends Renderer<HeaderProps<D>> = Renderer<HeaderProps<D>>
+> = Omit<HvTableColumnOptions<D>, "Header"> & {
+  Header?: H;
+} & HvColumnInterfaceBasedOnValue<D> &
+  (
+    | { Header: H }
+    | { id: IdType<D> }
+    | { accessor: keyof D extends never ? IdType<D> : never }
+  ) & {
+    accessor?: keyof D extends never ? IdType<D> | Accessor<D> : Accessor<D>;
+  };
 
-export type HvCellProps<D extends object, V = any> = CellProps<D, V> & {
-  column: HvColumnInstance<D>;
-  row: HvRowInstance<D>;
-  cell: HvCellInstance<D, V>;
-};
-
-export type HvTableDefinitionConfig<
-  D extends object = Record<string, unknown>
-> = HvTableOptions<D>;
-
-export type HvTableColumnConfig<D extends object = Record<string, unknown>> =
-  | HvColumnGroup<D>
-  | HvColumnWithLooseAccessor<D>
-  | HvColumnWithStrictAccessor<D>;
+export type HvTableColumnConfig<
+  D extends object = Record<string, unknown>,
+  H extends Renderer<HeaderProps<D>> = Renderer<HeaderProps<D>>
+> =
+  | HvColumnGroup<D, H>
+  | HvColumnWithLooseAccessor<D, H>
+  | HvColumnWithStrictAccessor<D, H>;
 
 // #region HOOKS
 export interface HvHooks<D extends object = Record<string, unknown>>
@@ -219,10 +231,9 @@ export interface HvTableState<D extends object = Record<string, unknown>>
 // #endregion
 
 // #region OPTIONS
-export interface HvTableOptions<D extends object>
+export interface HvTableOptions<D extends object = Record<string, unknown>>
   extends Omit<TableOptions<D>, "columns" | "data">,
     UseExpandedOptions<D>,
-    UseFiltersOptions<D>,
     UseFiltersOptions<D>,
     UseGlobalFiltersOptions<D>,
     UseGroupByOptions<D>,
@@ -281,9 +292,8 @@ export interface HvTableInstance<D extends object = Record<string, unknown>>
   rowsById: Record<string, HvRowInstance<D>>;
   flatRows: Array<HvRowInstance<D>>;
   getHooks: () => HvHooks<D>;
-  getTableProps: (
-    propGetter?: TablePropGetter<D> & HvExtraProps
-  ) => HvUseTableProps;
+  getTableProps: (propGetter?: TablePropGetter<D>) => HvUseTableProps;
+  prepareRow: (row: HvRowInstance<D>) => void;
   selectedFlatRows: Array<HvRowInstance<D>>;
   initialRows: Array<HvRowInstance<D>>;
   initialRowsById: Record<string, HvRowInstance<D>>;
@@ -293,9 +303,9 @@ export interface HvTableInstance<D extends object = Record<string, unknown>>
 export interface HvColumnInstance<D extends object = Record<string, unknown>>
   extends Omit<
       ColumnInstance<D>,
-      "Cell" | "columns" | "parent" | "placeholderOf"
+      "Cell" | "columns" | "parent" | "placeholderOf" | "id"
     >,
-    Omit<HvTableColumnOptions<D>, "id">,
+    HvTableColumnOptions<D>,
     UseFiltersColumnProps<D>,
     UseGroupByColumnProps<D>,
     UseResizeColumnsColumnProps<D>,
@@ -318,8 +328,8 @@ export interface HvRowInstance<D extends object = Record<string, unknown>>
       | "subRows"
     >,
     Omit<UseGroupByRowProps<D>, "subRows">,
-    Omit<UseHvRowSelectionRowInstance, "subRows">,
-    Omit<UseHvRowExpandRowInstance<D>, "subRows"> {
+    Omit<UseHvRowExpandRowInstance<D>, "subRows">,
+    UseHvRowSelectionRowInstance {
   cells: Array<HvCellInstance<D>>;
   allCells: Array<HvCellInstance<D>>;
   getRowProps: (propGetter?: RowPropGetter<D>) => HvUseTableRowProps;
@@ -336,9 +346,7 @@ export interface HvCellInstance<
     UseGroupByCellProps<D> {
   column: HvColumnInstance<D>;
   row: HvRowInstance<D>;
-  getCellProps: (
-    propGetter?: CellPropGetter<D> & HvExtraProps
-  ) => HvUseTableCellProps;
+  getCellProps: (propGetter?: CellPropGetter<D>) => HvUseTableCellProps;
 }
 // #endregion
 
@@ -354,6 +362,7 @@ export interface HvUseTableHeaderProps
     UseHvHeaderGroupsColumnProps,
     UseHvResizeColumnProps,
     UseHvSortByColumnProps {}
+
 export interface HvUseTableFooterProps
   extends TableFooterProps,
     UseHvTableStylesTableCellProps {}
@@ -383,7 +392,7 @@ export { PluginHook as HvTablePluginHook };
 
 // #endregion ##### TYPES #####
 
-const toTitleCase = (str) => {
+const toTitleCase = (str: string) => {
   return str
     .replace(/([^A-Z])([A-Z])/g, "$1 $2") // split cameCase
     .replace(/[_-]+/g, " ") // split snake_case and lisp-case
@@ -393,18 +402,25 @@ const toTitleCase = (str) => {
     .trim(); // remove leading/trailing whitespace
 };
 
-const useDefaultData = (data) =>
-  useMemo(() => {
+function useDefaultData<D extends object = Record<string, unknown>>(
+  data?: HvTableOptions<D>["data"]
+) {
+  return useMemo(() => {
     return data || [];
   }, [data]);
+}
 
-const useDefaultColumns = (columns, data) =>
-  useMemo(() => {
+function useDefaultColumns<D extends object = Record<string, unknown>>(
+  data: NonNullable<HvTableOptions<D>["data"]>,
+  columns?: HvTableOptions<D>["columns"]
+) {
+  return useMemo(() => {
     if (columns != null) {
       return columns;
     }
 
     const uniqueKeys = Object.keys(Object.assign({}, ...data));
+
     return uniqueKeys
       .filter((key) => !["subRows", "subComponent"].includes(key))
       .map((key) => ({
@@ -412,6 +428,7 @@ const useDefaultColumns = (columns, data) =>
         Header: toTitleCase(key),
       }));
   }, [columns, data]);
+}
 
 const ensureCorePluginInstallation = (
   plugins,
@@ -448,7 +465,6 @@ const useInstanceHook = (instance) => {
 const useHvTableSetup = (hooks) => {
   hooks.useInstance.push(useInstanceHook);
 };
-
 useHvTableSetup.pluginName = "useHvTableSetup";
 
 function useHvTable<D extends object = Record<string, unknown>>(
@@ -457,8 +473,8 @@ function useHvTable<D extends object = Record<string, unknown>>(
 ): HvTableInstance<D> {
   const { data: dataProp, columns: columnsProp, ...others } = options;
 
-  const data = useDefaultData(dataProp);
-  const columns = useDefaultColumns(columnsProp, data);
+  const data = useDefaultData<D>(dataProp);
+  const columns = useDefaultColumns<D>(data, columnsProp);
 
   ensureCorePluginInstallation(plugins, "useHvPagination", usePagination);
   ensureCorePluginInstallation(plugins, "useHvRowExpand", useExpanded);
