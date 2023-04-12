@@ -11,12 +11,11 @@ import {
   useHvData,
   useHvPagination,
 } from "@hitachivantara/uikit-react-core";
-
 import { getColumns, makeData, NewEntry } from "../utils";
 import classes from "./styles";
 
 export const Table = () => {
-  const originalData: NewEntry[] = useMemo(() => makeData(10), []);
+  const originalData = useMemo(() => makeData(10), []);
   const [data] = useState(originalData);
   const columns = useMemo(() => getColumns(), []);
 
@@ -41,9 +40,7 @@ export const Table = () => {
           <HvTableHead>
             <HvTableRow>
               {columns.map((col) => (
-                <HvTableHeader key={col.Header as string}>
-                  {col.Header as string}
-                </HvTableHeader>
+                <HvTableHeader key={col.Header}>{col.Header}</HvTableHeader>
               ))}
             </HvTableRow>
           </HvTableHead>

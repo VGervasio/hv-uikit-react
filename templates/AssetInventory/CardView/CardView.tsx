@@ -11,7 +11,6 @@ import {
   HvSemanticColorKeys,
   HvTableInstance,
 } from "@hitachivantara/uikit-react-core";
-
 import { getStatusIcon } from "../utils";
 
 interface CarViewProps {

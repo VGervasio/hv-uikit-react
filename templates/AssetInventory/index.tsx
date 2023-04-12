@@ -13,7 +13,6 @@ import {
   useHvBulkActions,
   useHvPagination,
 } from "@hitachivantara/uikit-react-core";
-
 import { ListView } from "./ListView";
 import { CardView } from "./CardView";
 import {
@@ -32,7 +31,7 @@ const AssetInventory = () => {
   const [data] = useState(originalData);
   const columns = useMemo(() => getColumns(), []);
 
-  const instance = useHvData(
+  const instance = useHvData<AssetInventoryModel>(
     {
       data,
       columns,
